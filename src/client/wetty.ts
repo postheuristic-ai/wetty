@@ -3,6 +3,7 @@ import { faCogs, faKeyboard } from '@fortawesome/free-solid-svg-icons';
 import _ from 'lodash';
 
 import '../assets/scss/styles.scss';
+import '../assets/fonts/monaco-nerd-font.css';
 
 import { disconnect } from './wetty/disconnect';
 import { overlay } from './wetty/disconnect/elements';

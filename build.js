@@ -46,6 +46,9 @@ async function buildClient(watching){
         format: 'esm',
         minify: !watching,
         sourcemap: !watching,
+        loader: {
+            '.ttf': 'file',
+        },
         plugins: [
             typechecker,
             sassPlugin({
@@ -57,6 +60,7 @@ async function buildClient(watching){
                 assets: [
                     {from: './src/assets/xterm_config/*', to: 'xterm_config'},
                     {from: './src/assets/favicon.ico', to: 'favicon.ico'},
+                    {from: './src/assets/fonts/*', to: 'fonts'},
                 ],
                 watch: watching,
             }),

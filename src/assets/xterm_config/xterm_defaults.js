@@ -15,7 +15,7 @@ window.loadOptions({
     drawBoldTextInBrightColors: true,
     fastScrollModifier: 'alt',
     fastScrollSensitivity: 5,
-    fontFamily: 'courier-new, courier, monospace',
+    fontFamily: 'NerdFontMono, courier-new, courier, monospace',
     fontSize: 15,
     fontWeight: 'normal',
     fontWeightBold: 'bold',
