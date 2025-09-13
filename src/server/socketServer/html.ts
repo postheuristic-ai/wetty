@@ -15,6 +15,16 @@ const render = (
     <link rel="icon" type="image/x-icon" href="${base}/client/favicon.ico">
     <title>${title}</title>
     <link rel="stylesheet" href="${base}/client/wetty.css" />
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="${base}/client/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WeTTY">
+    <link rel="apple-touch-icon" href="${base}/client/icons/icon-192x192.png">
+    <meta name="msapplication-TileImage" content="${base}/client/icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#000000">
   </head>
   <body>
     <div id="overlay">
