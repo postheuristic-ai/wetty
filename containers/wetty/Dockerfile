@@ -33,6 +33,5 @@ COPY package.json /usr/src/app
 RUN apk add -U coreutils openssh-client sshpass && \
     mkdir ~/.ssh
 
-EXPOSE 8000
 ENTRYPOINT [ "node", "build/main.js" ]
 CMD [ ]
