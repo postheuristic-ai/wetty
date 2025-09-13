@@ -10,6 +10,7 @@ interface TerminalSession {
   isActive: boolean;
   args: string[];
   address: string;
+  socket?: SocketIO.Socket;
 }
 
 class SessionManager extends EventEmitter {
@@ -51,8 +52,16 @@ class SessionManager extends EventEmitter {
     // Set up terminal event handlers
     term.onExit(({ exitCode }) => {
       logger.info('Terminal process exited', { sessionId, exitCode, pid: term.pid });
-      // Don't immediately remove - let the cleanup process handle it
-      // or remove it explicitly only if it was a clean exit
+
+      // When terminal exits, we should clean up the session and notify client
+      const exitingSession = this.sessions.get(sessionId);
+      if (exitingSession && exitingSession.socket) {
+        logger.info('Notifying client of terminal exit', { sessionId, exitCode });
+        exitingSession.socket.emit('logout');
+      }
+
+      // Remove the session since the terminal is no longer available
+      this.removeSession(sessionId);
       this.emit('session-ended', sessionId, exitCode);
     });
 
@@ -82,6 +91,7 @@ class SessionManager extends EventEmitter {
     const logger = getLogger();
     session.isActive = true;
     session.lastActivity = Date.now();
+    session.socket = socket; // Track the current socket
 
     logger.info('Socket attached to session', { sessionId, socketId: socket.id });
     return true;
@@ -96,6 +106,7 @@ class SessionManager extends EventEmitter {
     const logger = getLogger();
     session.isActive = false;
     session.lastActivity = Date.now();
+    session.socket = undefined; // Clear the socket reference
 
     logger.info('Socket detached from session', {
       sessionId,
