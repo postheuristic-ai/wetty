@@ -5,14 +5,11 @@ services:
       context: .
       dockerfile: containers/wetty/Dockerfile
     entrypoint: pnpm run docker-compose-entrypoint
-    tty: true
-    working_dir: /usr/src/app
     ports:
-      - '3000:3000'
+      - '8100:3000'
     environment:
-      SSHHOST: 'wetty-ssh'
-      SSHPORT: 22
-      NODE_ENV: 'development'
+      - SSHHOST=${SSHHOST}
+      - BASE=/pidev/
 
   web:
     image: nginx
