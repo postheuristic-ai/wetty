@@ -2,7 +2,7 @@
   "name": "WeTTY - Web Terminal",
   "short_name": "WeTTY",
   "description": "A web-based terminal emulator with SSH support",
-  "start_url": "/pidev",
+  "start_url": "/pidev?fullscreen=true",
   "display": "fullscreen",
   "orientation": "any",
   "theme_color": "#000000",
