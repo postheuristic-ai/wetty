@@ -11,6 +11,7 @@ import { verifyPrompt } from './wetty/disconnect/verify';
 import { FileDownloader } from './wetty/download';
 import { FlowControlClient } from './wetty/flowcontrol';
 import { mobileKeyboard } from './wetty/mobile';
+import { ConnectionResilience } from './wetty/resilience';
 import { socket } from './wetty/socket';
 import { terminal, Term } from './wetty/term';
 
@@ -25,9 +26,24 @@ function onResize(term: Term): () => void {
   };
 }
 
+// Initialize connection resilience
+const resilience = new ConnectionResilience(socket);
+let currentTerm: Term | undefined;
+
+// Set up reconnection callback to handle seamless reconnections
+resilience.setReconnectCallback(() => {
+  if (currentTerm && !_.isNull(overlay)) {
+    overlay.style.display = 'none';
+    currentTerm.resizeTerm();
+    currentTerm.focus();
+  }
+});
+
 socket.on('connect', () => {
   const term = terminal(socket);
   if (_.isUndefined(term)) return;
+
+  currentTerm = term;
 
   if (!_.isNull(overlay)) overlay.style.display = 'none';
   window.addEventListener('beforeunload', verifyPrompt, false);
@@ -67,9 +83,16 @@ socket.on('connect', () => {
       term.resizeTerm();
     })
     .on('logout', disconnect)
-    .on('disconnect', disconnect)
+    .on('disconnect', (reason: string) => {
+      // Use resilience system to determine if we should show disconnect UI
+      if (!resilience.shouldSuppressDisconnectUI(reason)) {
+        disconnect(reason);
+      }
+    })
     .on('error', (err: string | null) => {
-      if (err) disconnect(err);
+      if (err && !resilience.shouldSuppressDisconnectUI(err)) {
+        disconnect(err);
+      }
     });
 });
 

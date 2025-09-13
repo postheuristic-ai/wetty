@@ -72,15 +72,42 @@ export async function decorateServerWithSsh(
      * @event wetty#connection
      * @name connection
      */
-    logger.info('Connection accepted.');
+    logger.info('Connection accepted.', {
+      socketId: socket.id,
+      sessionId: socket.handshake.auth?.sessionId || 'none'
+    });
     wettyConnections.inc();
 
     try {
+      // Check for existing session first (before authentication)
+      const sessionId = socket.handshake.auth?.sessionId as string;
+      logger.info('Checking for existing session', { sessionId: sessionId || 'none', socketId: socket.id });
+
+      if (sessionId) {
+        // Try to reconnect to existing session
+        const { sessionManager } = await import('./server/sessionManager.js');
+        const existingSession = sessionManager.getSession(sessionId);
+
+        if (existingSession) {
+          logger.info('Reconnecting to existing session', { sessionId, socketId: socket.id, pid: existingSession.term.pid });
+          await spawn(socket, existingSession.args, existingSession);
+          logger.info('Session reconnection completed', { sessionId, socketId: socket.id });
+          return; // Skip authentication flow
+        } 
+          logger.info('Session not found, proceeding with authentication', { sessionId, socketId: socket.id });
+          socket.emit('clear-session-id');
+        
+      }
+
+      // No existing session - proceed with normal authentication flow
+      logger.info('Getting command for socket', { socketId: socket.id });
       const args = await getCommand(socket, ssh, command, forcessh);
-      logger.debug('Command Generated', { cmd: args.join(' ') });
+      logger.info('Command Generated', { cmd: args.join(' '), socketId: socket.id });
+      logger.info('Calling spawn for socket', { socketId: socket.id });
       await spawn(socket, args);
+      logger.info('Spawn completed for socket', { socketId: socket.id });
     } catch (error) {
-      logger.info('Disconnect signal sent', { err: error });
+      logger.info('Error in connection handler', { err: error, socketId: socket.id });
       wettyConnections.dec();
     }
   });

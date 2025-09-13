@@ -30,7 +30,9 @@ export const listen = (
         }),
     {
       path: `${path}/socket.io`,
-      pingInterval: 3000,
-      pingTimeout: 7000,
+      pingInterval: 5000,
+      pingTimeout: 15000,
+      transports: ['websocket', 'polling'],
+      allowEIO3: true,
     },
   );

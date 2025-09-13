@@ -1,6 +1,7 @@
 import { dirname, resolve as resolvePath } from 'path';
 import { fileURLToPath } from 'url';
 import pty from 'node-pty';
+import { logger } from '../shared/logger.js';
 import { xterm } from './shared/xterm.js';
 import type SocketIO from 'socket.io';
 
@@ -17,7 +18,7 @@ export function login(socket: SocketIO.Socket): Promise<string> {
   let buf = '';
   return new Promise((resolve, reject) => {
     term.onExit(({ exitCode }) => {
-      console.error(`Process exited with code: ${exitCode}`);
+      logger().info(`Process exited with code: ${exitCode}`);
       resolve(buf);
     });
     term.onData((data: string) => {
