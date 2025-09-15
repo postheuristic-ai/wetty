@@ -20,11 +20,6 @@ library.add(faCogs);
 library.add(faKeyboard);
 dom.watch();
 
-function onResize(term: Term): () => void {
-  return function resize() {
-    term.resizeTerm();
-  };
-}
 
 // Initialize connection resilience
 const resilience = new ConnectionResilience(socket);
@@ -47,7 +42,7 @@ socket.on('connect', () => {
 
   if (!_.isNull(overlay)) overlay.style.display = 'none';
   window.addEventListener('beforeunload', verifyPrompt, false);
-  window.addEventListener('resize', onResize(term), false);
+  // Resize handling is now done in term.ts using Visual Viewport API
 
   term.resizeTerm();
   term.focus();

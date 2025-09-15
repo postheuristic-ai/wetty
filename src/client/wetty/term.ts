@@ -220,9 +220,26 @@ export function terminal(socket: Socket): Term | undefined {
   termElement.innerHTML = '';
   term.open(termElement);
   configureTerm(term);
-  window.onresize = function onResize() {
+  // Set up viewport-aware resize handling
+  const handleResize = () => {
+    // Update container height to match visual viewport before resizing
+    if (window.visualViewport && termElement) {
+      termElement.style.height = `${window.visualViewport.height}px`;
+    }
     term.resizeTerm();
   };
+
+  // Use Visual Viewport API if available (better for mobile keyboards)
+  if (window.visualViewport) {
+    // Set initial height
+    if (termElement) {
+      termElement.style.height = `${window.visualViewport.height}px`;
+    }
+    window.visualViewport.addEventListener('resize', handleResize);
+  } else {
+    // Fallback to window resize for browsers without Visual Viewport API
+    window.addEventListener('resize', handleResize);
+  }
   window.wetty_term = term;
   window.toggleFunctions = toggleFunctions;
   window.toggleCTRL = toggleCTRL;

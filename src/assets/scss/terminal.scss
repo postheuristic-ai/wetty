@@ -1,6 +1,14 @@
 #terminal {
   display: flex;
   height: 100%;
+  height: 100dvh; /* Dynamic viewport height for modern browsers */
   position: relative;
   width: 100%;
+}
+
+/* Fallback for browsers that don't support dvh */
+@supports not (height: 100dvh) {
+  #terminal {
+    height: 100%;
+  }
 }
